@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "519552638385",
+    "project_id": "test-72bf6",
+    "storage_bucket": "test-72bf6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519552638385:android:26c4c4f06b17ad9860f190",
+        "android_client_info": {
+          "package_name": "com.example.Food_Calories_Assessment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "519552638385-nodsdapu7bdm64qs9cu05bsadkpbenu8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.Food_Calories_Assessment",
+            "certificate_hash": "32dcbf884252e28e815c11e2b285184f6280d6f1"
+          }
+        },
+        {
+          "client_id": "519552638385-iac9h6te3m16bqhab51m0j10norb04f0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2Ml9vWnr5Nwb8qTbLBmMODV3ZibyjFqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "519552638385-iac9h6te3m16bqhab51m0j10norb04f0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
