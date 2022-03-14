@@ -1,0 +1,13 @@
+[1mdiff --git a/lib/module/register/register.dart b/lib/module/register/register.dart[m
+[1mindex 87d01d8..bf639f2 100644[m
+[1m--- a/lib/module/register/register.dart[m
+[1m+++ b/lib/module/register/register.dart[m
+[36m@@ -377,7 +377,7 @@[m [mclass _RegisterState extends State<Register> {[m
+                                 controller: textFieldControlComfirm,[m
+                                 validator: (val) {[m
+                                   if(val!.isEmpty){[m
+[31m-                                    return "Can't be empty";[m
+[32m+[m[32m                                    return "/*Can't*/ be empty";[m
+                                   }else if(val != textFieldControlPass.text){[m
+                                     return "Not The Same Password";[m
+                                   }[m
