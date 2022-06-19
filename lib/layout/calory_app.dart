@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:untitled6/shared/cubit/cubit.dart';
 import 'package:untitled6/shared/cubit/states.dart';
 
@@ -17,30 +18,27 @@ class CaloLayout  extends StatelessWidget {
         builder: ( context,state){
           var cubit=NewsCubit.get(context);
           return  Scaffold(
-
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: cubit.currentIndex,
               items:cubit.bottomNavigationBarItem,
               onTap: (index){
                 cubit.changeBottomNavigationBar(index);
               },
-
             ),
-            // floatingActionButton: FloatingActionButton(
-            //   onPressed: (){
-            //     // DioHelper.getData(url: 'v2/everything',
-            //     //     query: {'country':'us',
-            //     //            'category':'business' ,
-            //     //            'apiKey':'64fd63236abf4ba0bf276922c13e40ec'}
-            //     // ).then((value){
-            //     //   print(value.data.toString());
-            //     // }).catchError((error){
-            //     //   print(error.toString());
-            //     // });
-            //   },
-            //   child: Icon(Icons.add,),
-            // ),
             body: cubit.screen[cubit.currentIndex],
+
+
+            // bottomNavigationBar: PersistentTabView(
+            //   context,
+            //   screens: cubit.screen(),
+            //   decoration: NavBarDecoration(
+            //     borderRadius: BorderRadius.circular(20.0),
+            //   ),
+            //   items: cubit.bottomNavigationBarItem,
+            //   navBarStyle: NavBarStyle.style9,
+            //   // navBarHeight: 70,
+            //   hideNavigationBar: false,
+            // ),
           );
         },
       ),

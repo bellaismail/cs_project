@@ -61,10 +61,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool spinner = false;
 
-  initState(){
-
-  }
-
   loginFun(context)async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if(connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi){
@@ -77,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             spinner = false;
           });
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -98,7 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             spinner = false;
           });
-          ScaffoldMessenger.of(context).showSnackBar(snackBar("some thing wrong"),);
+          print("*/**/**/**/**/**/**/${e.runtimeType}*/*/*/*/*/*/*/*/*/*/*/*/*");
+          // ScaffoldMessenger.of(context).showSnackBar(snackBar("some thing wrong"),);
         }
       }
     }else{
@@ -115,32 +113,32 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, state) {
           var cubit = NewsCubit.get(context);
           return Scaffold(
-            appBar: AppBar(
-              elevation: 0.0,
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarColor: Colors.white,
-                statusBarBrightness: Brightness.dark,
-              ),
-              backgroundColor: Colors.white,
-              actions: [
-                MaterialButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CaloLayout(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'skip',
-                    style: TextStyle(
-                      color: Colors.green,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // appBar: AppBar(
+            //   elevation: 0.0,
+            //   systemOverlayStyle: const SystemUiOverlayStyle(
+            //     statusBarColor: Colors.white,
+            //     statusBarBrightness: Brightness.dark,
+            //   ),
+            //   backgroundColor: Colors.white,
+            //   actions: [
+            //     MaterialButton(
+            //       onPressed: () {
+            //         Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //             builder: (context) => const CaloLayout(),
+            //           ),
+            //         );
+            //       },
+            //       child: const Text(
+            //         'skip',
+            //         style: TextStyle(
+            //           color: Colors.green,
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             body: ModalProgressHUD(
               inAsyncCall: spinner,
               child: Padding(

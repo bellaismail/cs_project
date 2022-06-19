@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled6/module/bmi_result/bmi_result.dart';
+
+import 'bmi_result.dart';
 
 class BMICalculatorScreen extends StatefulWidget {
   @override
@@ -20,7 +23,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.all(32),
+          padding: const EdgeInsets.only(top: 60.0, left: 10.0, right: 10.0,),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -31,101 +34,195 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   color: Colors.white24,
                   image: DecorationImage(
                     opacity: 0.9,
-                    image: AssetImage("asset/image/bmi.jpg"),
+                    image: AssetImage("asset/bmi/homeBmi.jpeg"),
                     fit: BoxFit.fill,
                   ),
-                  borderRadius:BorderRadius.all(Radius.circular(5.0)),
-
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
-              Text("BMI Calculator", style: TextStyle(color: Colors.red[700], fontSize: 34, fontWeight: FontWeight.w700),),
-              Text("We care about your health", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w400),),
-              SizedBox(
+              Text(
+                "BMI Calculator",
+                style: TextStyle(
+                    color: Colors.green[700],
+                    fontSize: 34,
+                    fontWeight: FontWeight.w700),
+              ),
+              const Text(
+                "We care about your health",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400),
+              ),
+              const SizedBox(
                 height: 32,
               ),
-
-              Text("Height (cm)", style: TextStyle(color: Colors.grey, fontSize: 24, fontWeight: FontWeight.w400),),
-
+              const Text(
+                "Height (cm)",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w400),
+              ),
               Container(
-                padding: EdgeInsets.only(left: 16, right: 16),
+                padding: const EdgeInsets.only(left: 16, right: 16),
                 child: Slider(
                   min: 80.0,
                   max: 250.0,
-                  onChanged: (height){
+                  onChanged: (height) {
                     setState(() {
                       _heightOfUser = height;
                     });
                   },
                   value: _heightOfUser,
                   divisions: 100,
-                  activeColor: Colors.pink,
-                  label: "$_heightOfUser",
+                  activeColor: Colors.green,
+                  label: _heightOfUser.toStringAsFixed(1),
                 ),
               ),
-
-              Text("$_heightOfUser cm", style: TextStyle(color: Colors.pink, fontSize: 18, fontWeight: FontWeight.w900),),
-
-              SizedBox(height: 24,),
-
-              Text("Weight (kg)", style: TextStyle(color: Colors.grey, fontSize: 24, fontWeight: FontWeight.w400),),
-
+              Text(
+                "${_heightOfUser.toStringAsFixed(1)} cm",
+                style: TextStyle(
+                    color: Colors.green[700],
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(
+                height: 24,
+              ),
+              const Text(
+                "Weight (kg)",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w400),
+              ),
               Container(
-                padding: EdgeInsets.only(left: 16, right: 16),
+                padding: const EdgeInsets.only(left: 16, right: 16),
                 child: Slider(
                   min: 30.0,
                   max: 120.0,
-                  onChanged: (height){
+                  onChanged: (height) {
                     setState(() {
                       _weightOfUser = height;
                     });
                   },
                   value: _weightOfUser,
                   divisions: 100,
-                  activeColor: Colors.pink,
-                  label: "$_weightOfUser",
+                  activeColor: Colors.green,
+                  label: _weightOfUser.toStringAsFixed(1),
                 ),
               ),
-
-              Text("$_weightOfUser kg", style: TextStyle(color: Colors.pink, fontSize: 18, fontWeight: FontWeight.w900),),
-
-              SizedBox(height: 16,),
-
+              Text(
+                "${_weightOfUser.toStringAsFixed(1)} kg",
+                style: TextStyle(
+                    color: Colors.green[700],
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
               Container(
+                padding: const EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(6.0),
+                width: double.infinity,
+                height: 60.0,
                 child: FlatButton.icon(
-                  onPressed: (){
+                  onPressed: () {
                     setState(() {
-                      _bmi = _weightOfUser/((_heightOfUser/100)*(_heightOfUser/100));
+                      _bmi = _weightOfUser /
+                          ((_heightOfUser / 100) * (_heightOfUser / 100));
 
-                      if(_bmi >= 18.5 && _bmi <= 25){
-                        _bmiModel = BMIModel(bmi: _bmi, isNormal: true, comments: "You are Totaly Fit",  );
-                      }else if(_bmi < 18.5){
-                        _bmiModel = BMIModel(bmi: _bmi, isNormal: false, comments: "You are Underweighted",  );
-                      }else if(_bmi > 25 && _bmi <= 30){
-                        _bmiModel = BMIModel(bmi: _bmi, isNormal: false, comments: "You are Overweighted", );
-
-                      }else{
-                        _bmiModel = BMIModel(bmi: _bmi, isNormal: false, comments: "You are Obesed", );
-
+                      if (_bmi >= 18.5 && _bmi <= 25) {
+                        _bmiModel = BMIModel(
+                          bmi: _bmi,
+                          isNormal: true,
+                          comments: "You are Totaly Fit",
+                        );
+                      } else if (_bmi < 18.5) {
+                        _bmiModel = BMIModel(
+                          bmi: _bmi,
+                          isNormal: false,
+                          comments: "You are Underweighted",
+                        );
+                      } else if (_bmi > 25 && _bmi <= 30) {
+                        _bmiModel = BMIModel(
+                          bmi: _bmi,
+                          isNormal: false,
+                          comments: "You are Overweighted",
+                        );
+                      } else {
+                        _bmiModel = BMIModel(
+                          bmi: _bmi,
+                          isNormal: false,
+                          comments: "You are Obesed",
+                        );
                       }
                     });
 
-                    Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => ResultScreen(bmiModel: _bmiModel,)
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ResultScreen(
+                          bmiModel: _bmiModel,
+                        ),
+                      ),
+                    );
                   },
-                  icon: Icon(Icons.favorite_sharp, color: Colors.white,),
-                  label: Text("CALCULATE"),
+                  icon: const Icon(
+                    Icons.favorite_sharp,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Calculate",
+                    style: TextStyle(fontSize: 20, fontFamily: "Cairo",),
+                  ),
                   textColor: Colors.white,
-                  color: Colors.pink,
-
+                  color: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
                 ),
-                width: double.infinity,
-                padding: EdgeInsets.only(left: 16, right: 16),
               ),
-
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(6.0),
+                width: double.infinity,
+                height: 60.0,
+                child: FlatButton.icon(
+                  onPressed: () async{
+                    String userId = FirebaseAuth.instance.currentUser!.uid;
+                    try{
+                      await FirebaseFirestore.instance.collection("UserInfo").doc(userId).update({
+                        "height": _heightOfUser.round(),
+                        "weight": _weightOfUser.round(),
+                      });
+                    }catch(e){
+                      print("*************************${e.runtimeType}****************");
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.update,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Update",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: "Cairo",
+                    ),
+                  ),
+                  textColor: Colors.white,
+                  color: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -133,12 +230,15 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
     );
   }
 }
-class BMIModel{
+
+class BMIModel {
   double bmi;
   bool isNormal;
-
   String comments;
 
-
-  BMIModel({required this.bmi, required this.isNormal, required this.comments,});
+  BMIModel({
+    required this.bmi,
+    required this.isNormal,
+    required this.comments,
+  });
 }

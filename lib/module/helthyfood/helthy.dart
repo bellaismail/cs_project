@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:untitled6/module/home/home_page.dart';
-import 'breakfast/breakfast.dart';
-import 'dinner/dinner.dart';
-import 'lunch/lunch.dart';
+import 'package:untitled6/module/helthyfood/detox%20wator.dart';
+import 'package:untitled6/module/helthyfood/healthItemDetails/healthy_item_details.dart';
 
 class HealthyScreen extends StatelessWidget {
   const HealthyScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    int countData=15;
-    var device = MediaQuery.of(context).size;
+    // int countData = 15;
+    // var device = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         leading: IconButton(
-          onPressed: (){
-            Navigator.push(context, MaterialPageRoute(
-              builder:(context) =>DailyScreen(),
-            ),);
-          }, icon: Icon(Icons.arrow_back_ios,color: Colors.green,),
+          onPressed: () {
+            Navigator.pop(context);
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => const DailyScreen(),
+            //   ),
+            // );
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.green,
+          ),
         ),
         elevation: 0.0,
         systemOverlayStyle: const SystemUiOverlayStyle(
@@ -27,121 +34,117 @@ class HealthyScreen extends StatelessWidget {
           statusBarBrightness: Brightness.dark,
         ),
         backgroundColor: Colors.white,
-        title: Text('HealthyFood',style: TextStyle(color:Colors.green),),
-
+        title: const Text(
+          'HealthyFood',
+          style: TextStyle(color: Colors.green, fontFamily: "Cairo",),
+        ),
       ),
-
       body: Center(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Container(
-              margin:  const EdgeInsets.all(2.0),
-            padding: const EdgeInsets.all(8.0),
-
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
-                InkWell(
-                  child: Container(
-
-                      height: 230,
-                      width: double.infinity,
-                      decoration:  const BoxDecoration(
-                        borderRadius:BorderRadius.all(Radius.circular(10.0)),
-                        color: Colors.black,
-                        image: DecorationImage(
-                          opacity: 0.7,
-                            image: NetworkImage('https://simply-delicious-food.com/wp-content/uploads/2018/10/breakfast-board.jpg'),
-                            // image: AssetImage("asset/image/breakfast.jpg"),
-                            fit: BoxFit.cover,
-                        ),
-
-
-                      ),
-                    child: Center(
-                      child: Text('BreakFast',
-                        style: TextStyle(fontSize: 40.0,
-
-                        color: Colors.white),
-                      ),
-                    ),
-
-                    // Foreground widget here
-                  ),
-                  onTap: (){
+                HealthyFoodContainers(
+                  key: key,
+                  text: "BreakFast",
+                  imagePath: "breakfast-board.jpg",
+                  onPressedFun: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (builder) => BreakFastScreen(),
+                        builder: (context) => HealthyItemDetails(pageName: "Break Fast", collectionName: "Breakfast"),
                       ),
                     );
                   },
                 ),
-                SizedBox(height: 10.0,),
-                InkWell(
-                  child: Container(
-                    height:230,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      borderRadius:BorderRadius.all(Radius.circular(10.0)),
-                      color: Colors.black,
-                      image: DecorationImage(
-                        opacity: 0.8,
-                          image: NetworkImage('https://sethlui.com/wp-content/uploads/2020/11/Christmas-2020-home-dining-online-little-farms-1.jpg'),
-                          // image: AssetImage("asset/image/073.jpg"),
-                          fit: BoxFit.cover),
-                    ),
-                    child: Center(child: Text('Lunch',
-                      style: TextStyle(fontSize: 40.0,
-
-                          color: Colors.white),
-                    )),
-                    // Foreground widget here
-                  ),
-                    onTap: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => LunchScreen(),
-                        ),
-                      );
-                    },
-                ),
-                SizedBox(height: 10.0,),
-                InkWell(
-                  child: Container(
-                    height: 230,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      borderRadius:BorderRadius.all(Radius.circular(10.0)),
-                      color: Colors.black,
-                      image: DecorationImage(
-                        opacity: 0.7,
-                          // image: AssetImage("asset/image/dinner.jpg"),
-                          image:NetworkImage('https://www.chowhound.com/a/img/resize/56859f073cdebf13afc4aa1f6445ae5c75094453/2019/06/last-minute-dinner-party-ideas-chowhound-670x501.jpg?fit=bounds&width=800'),
-                          fit: BoxFit.cover),
-                    ),
-                    child: Center(child: Text('Dinner',
-                      style: TextStyle(fontSize: 40.0,
-
-                          color: Colors.white),
-                    )),
-                    // Foreground widget here
-                  ),
-                  onTap: (){
+                const SizedBox(height: 10.0),
+                HealthyFoodContainers(
+                  key: key,
+                  text: "Lunch",
+                  imagePath: "Lunch.jpg",
+                  onPressedFun: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (builder) => DinnerScreen(),
+                        builder: (context) => HealthyItemDetails(pageName: "Lunch", collectionName: "Lunch"),
                       ),
                     );
-
                   },
                 ),
+                const SizedBox(height: 10.0),
+                HealthyFoodContainers(
+                  key: key,
+                  text: "Dinner",
+                  imagePath: "dinner1.jpg",
+                  onPressedFun: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HealthyItemDetails(pageName: "Dinner", collectionName: "Dinner"),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                HealthyFoodContainers(
+                  key: key,
+                  text: "Water",
+                  imagePath: "mainWater.jpeg",
+                  onPressedFun: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WaterSecoundScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20.0),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+}
 
+class HealthyFoodContainers extends StatelessWidget {
+  const HealthyFoodContainers(
+      {Key? key, this.text, this.imagePath, this.onPressedFun})
+      : super(key: key);
+
+  final String? text;
+  final String? imagePath;
+  final VoidCallback? onPressedFun;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Container(
+        height: 210,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          color: Colors.black,
+          image: DecorationImage(
+            opacity: 0.7,
+            image: AssetImage("asset/healthyFood/$imagePath"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            text!,
+            style: const TextStyle(fontSize: 40.0, color: Colors.white, fontFamily: "Cairo",),
+          ),
+        ),
+      ),
+      onTap: () {
+        onPressedFun!();
+      },
+    );
   }
 }
