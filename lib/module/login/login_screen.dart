@@ -1,23 +1,21 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+
+//import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+//import 'package:connectivity_plus/connectivity_plus.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:untitled6/layout/calory_app.dart';
 import 'package:untitled6/module/register/register.dart';
 import 'package:untitled6/shared/cubit/cubit.dart';
 import 'package:untitled6/shared/cubit/states.dart';
-
-//import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-//import 'package:connectivity_plus/connectivity_plus.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-
-import '../home/home_page.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -61,15 +59,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool spinner = false;
 
-  loginFun(context)async {
+  loginFun(context) async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if(connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi){
-      if(this.formkey.currentState!.validate()){
-        try{
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      if (this.formkey.currentState!.validate()) {
+        try {
           setState(() {
             spinner = true;
           });
-          await FirebaseAuth.instance.signInWithEmailAndPassword(email: "$email", password: "$password");
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: "$email", password: "$password");
           setState(() {
             spinner = false;
           });
@@ -80,27 +80,35 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (builder) => const CaloLayout(),
             ),
           );
-        }on FirebaseAuthException catch(e){
+        } on FirebaseAuthException catch (e) {
           setState(() {
             spinner = false;
           });
-          if(e.code == "user-not-found"){
-            ScaffoldMessenger.of(context).showSnackBar(snackBar("Email Not Founded"),);
-          }else if(e.code == "wrong-password"){
-            ScaffoldMessenger.of(context).showSnackBar(snackBar("Email Not Founded"),);
-          }else if(e.code == "invalid-email"){
-            ScaffoldMessenger.of(context).showSnackBar(snackBar("Wrong Email format"),);
+          if (e.code == "user-not-found") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              snackBar("Email Not Founded"),
+            );
+          } else if (e.code == "wrong-password") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              snackBar("Email Not Founded"),
+            );
+          } else if (e.code == "invalid-email") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              snackBar("Wrong Email format"),
+            );
           }
-        }catch(e){
+        } catch (e) {
           setState(() {
             spinner = false;
           });
-          print("*/**/**/**/**/**/**/${e.runtimeType}*/*/*/*/*/*/*/*/*/*/*/*/*");
+          print(
+              "*/**/**/**/**/**/**/${e.runtimeType}*/*/*/*/*/*/*/*/*/*/*/*/*");
           // ScaffoldMessenger.of(context).showSnackBar(snackBar("some thing wrong"),);
         }
       }
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(snackBar("check you connection!"));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(snackBar("check you connection!"));
     }
   }
 
@@ -113,32 +121,6 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, state) {
           var cubit = NewsCubit.get(context);
           return Scaffold(
-            // appBar: AppBar(
-            //   elevation: 0.0,
-            //   systemOverlayStyle: const SystemUiOverlayStyle(
-            //     statusBarColor: Colors.white,
-            //     statusBarBrightness: Brightness.dark,
-            //   ),
-            //   backgroundColor: Colors.white,
-            //   actions: [
-            //     MaterialButton(
-            //       onPressed: () {
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) => const CaloLayout(),
-            //           ),
-            //         );
-            //       },
-            //       child: const Text(
-            //         'skip',
-            //         style: TextStyle(
-            //           color: Colors.green,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
             body: ModalProgressHUD(
               inAsyncCall: spinner,
               child: Padding(
@@ -286,14 +268,119 @@ class _LoginScreenState extends State<LoginScreen> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   "LOGIN".toUpperCase(),
-                                  style: TextStyle(fontSize: 20),
+                                  style: const TextStyle(fontSize: 20),
                                 ),
                               ),
                             ),
                           ),
-                          const Text('Forgot your password ?'),
-                          const SizedBox(
-                            height: 20.0,
+                          TextButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    String? emailVar;
+                                    return SingleChildScrollView(
+                                      child: Container(
+                                        padding:
+                                            MediaQuery.of(context).viewInsets,
+                                        child: Container(
+                                          height: 200,
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Column(
+                                            children: [
+                                              const SizedBox(
+                                                height: 20.0,
+                                              ),
+                                              TextField(
+                                                autofocus: true,
+                                                onChanged: (val) {
+                                                  emailVar = val;
+                                                },
+                                                decoration: InputDecoration(
+                                                  hintText: 'Email Address',
+                                                  hintStyle: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                  prefixIcon: const Icon(
+                                                    Icons.email,
+                                                    // color:on,
+                                                  ),
+                                                  suffixIcon: const Icon(
+                                                    Icons.alternate_email_sharp,
+                                                  ),
+                                                  contentPadding:
+                                                      const EdgeInsets.all(16),
+                                                  fillColor:
+                                                      Colors.grey.shade100,
+                                                  filled: true,
+                                                  focusColor: Colors.green,
+                                                  border:
+                                                      const OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(50.0),
+                                                    ),
+                                                    borderSide: BorderSide(
+                                                      // color: Colors.white,
+                                                      width: 0,
+                                                      style: BorderStyle.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 20.0,
+                                              ),
+                                              Container(
+                                                width: 120,
+                                                child: ElevatedButton(
+                                                  onPressed: () async {
+                                                    try{
+                                                      if (emailVar != null) {
+                                                        await FirebaseAuth
+                                                            .instance
+                                                            .sendPasswordResetEmail(
+                                                            email: emailVar!);
+                                                      }
+                                                      Fluttertoast.showToast(
+                                                        msg: "check your email",
+                                                        backgroundColor:Colors.grey,
+                                                        textColor: Colors.white,
+                                                        gravity: ToastGravity.TOP,
+                                                        fontSize: 16,
+                                                        toastLength: Toast.LENGTH_SHORT,
+                                                      );
+                                                    }on FirebaseAuthException catch(e){
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        snackBar("Email Not Used"),
+                                                      );
+                                                    }catch(e){
+                                                      print("***///***${e.runtimeType}***///***///");
+                                                    }
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(Colors.green),
+                                                  ),
+                                                  child: const Text("Send"),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  });
+                            },
+                            child: const Text(
+                              'Forgot password ?',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

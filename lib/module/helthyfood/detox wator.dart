@@ -29,7 +29,7 @@ class WaterSecoundScreen extends StatelessWidget {
                     decoration: const BoxDecoration(
                       color: Colors.black,
                       image: DecorationImage(
-                        image: AssetImage("asset/water/1.jpg"),
+                        image: AssetImage("asset/water/3.jpg"),
                         fit: BoxFit.cover,
                       ),
                     ),

@@ -4,8 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 class topText extends StatelessWidget {
   String text;
   bool isActive;
+  bool visi;
   Function onTap;
-  topText(this.text, this.isActive, this.onTap, {Key? key}) : super(key: key);
+
+  topText(this.text, this.isActive, this.onTap, {this.visi = true , Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,6 @@ class topText extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: () {
-          // do some things
           onTap();
         },
         child: Container(
@@ -23,18 +24,16 @@ class topText extends StatelessWidget {
               Text(
                 text,
                 style: GoogleFonts.aBeeZee(
-                    color: isActive ? Colors.teal : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isActive ? 25 : 20,
-                    letterSpacing: 2),
+                  color: isActive ? Colors.teal : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: isActive ? 25 : 20,
+                  letterSpacing: 2,
+                ),
               ),
-              // const SizedBox(
-              //   height: 5,
-              // ),
               Visibility(
                 visible: isActive,
                 child: Container(
-                  height: 3,
+                  height: visi?3:0.0,
                   width: 70,
                   color: Colors.teal,
                 ),

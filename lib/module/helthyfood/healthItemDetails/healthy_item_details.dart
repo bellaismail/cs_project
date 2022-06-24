@@ -139,7 +139,10 @@ class _RowSeparatedState extends State<RowSeparated> {
   getCount()async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      countIndex = preferences.getInt("count$userId${widget.pageName}${widget.index}")!;
+      countIndex = preferences.getInt("count$userId${widget.pageName}${widget.index}") ==
+          null
+          ? countIndex
+          : preferences.getInt("count$userId${widget.pageName}${widget.index}")!;
     });
   }
 
@@ -177,13 +180,6 @@ class _RowSeparatedState extends State<RowSeparated> {
 
   @override
   initState(){
-
-    // if(DateTime.now().day == 24){
-    //
-    // }
-
-    print("${DateTime.now()}");
-
     getCurrentUserId();
     getCount();
     super.initState();
@@ -270,19 +266,6 @@ class _RowSeparatedState extends State<RowSeparated> {
                   fit: BoxFit.cover,
                 ),
               ),
-              // child: CircleAvatar(
-              //   child: Image.network(
-              //     widget.snapshot!.data.docs[widget.index].data()["image"],
-              //     errorBuilder:
-              //         (BuildContext context, exception, stackTrace) {
-              //       return const Icon(
-              //         Icons.do_not_disturb,
-              //         color: Colors.grey,
-              //       );
-              //     },
-              //   ),
-              //   backgroundColor: Colors.white,
-              // ),
             ),
           ),
           const Expanded(child: SizedBox(width: 10.0)),
@@ -344,7 +327,7 @@ class _RowSeparatedState extends State<RowSeparated> {
         ],
       );
     }else{
-     return SizedBox();
+     return const SizedBox();
     }
     }
   }

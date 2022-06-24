@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../login/login_screen.dart';
 import '../about/about.dart';
 import '../personal/personal.dart';
@@ -16,11 +15,9 @@ class Setting extends StatefulWidget {
 
 class _SettingsPageState extends State<Setting> {
 
-
   bool showTimer = false;
   int time = 10;
   bool stop = false;
-
   bool spinner = false;
 
   @override

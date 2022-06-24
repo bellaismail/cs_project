@@ -9,7 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:untitled6/layout/calory_app.dart';
 import 'package:untitled6/module/login/login_screen.dart';
 import 'package:untitled6/shared/cubit/cubit.dart';
 import 'package:untitled6/shared/cubit/states.dart';
@@ -213,7 +212,7 @@ class _RegisterState extends State<Register> {
                                 },
                                 controller: textFieldControlUsername,
                                 validator: (val) {
-                                  if (val!.length < 8) {
+                                  if (val!.length < 5) {
                                     return "name can't be less than 8 letters";
                                   }
                                   if (val.contains("*") ||

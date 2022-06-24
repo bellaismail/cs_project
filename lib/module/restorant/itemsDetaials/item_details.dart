@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -17,7 +16,6 @@ class ItemDetails extends StatefulWidget {
 }
 
 class _ItemDetailsState extends State<ItemDetails> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,13 +78,12 @@ class _ItemDetailsState extends State<ItemDetails> {
 }
 
 class RowSeparated extends StatefulWidget {
-  RowSeparated(
-      {Key? key,
-      this.snapshot,
-      this.index,
-        this.pageName,
-      })
-      : super(key: key);
+  RowSeparated({
+    Key? key,
+    this.snapshot,
+    this.index,
+    this.pageName,
+  }) : super(key: key);
 
   final AsyncSnapshot? snapshot;
   final int? index;
@@ -101,52 +98,59 @@ class _RowSeparatedState extends State<RowSeparated> {
   String? userId;
   late YoutubePlayerController ytController;
 
-  getCurrentUserId()async{
+  getCurrentUserId() async {
     userId = FirebaseAuth.instance.currentUser!.uid;
   }
 
-  getCount()async{
+  getCount() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      countIndex = preferences.getInt("count$userId${widget.pageName}${widget.index}")!;
+      countIndex = preferences.getInt("count$userId${widget.pageName}${widget.index}") ==
+              null
+          ? countIndex
+          : preferences.getInt("count$userId${widget.pageName}${widget.index}")!;
     });
   }
 
-  incrementFun()async{
+  incrementFun() async {
     setState(() {
       countIndex++;
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setInt("count$userId${widget.pageName}${widget.index}", countIndex);
+    preferences.setInt(
+        "count$userId${widget.pageName}${widget.index}", countIndex);
 
+    int currentMealVal =
+        widget.snapshot!.data.docs[widget.index].data()["Calories"];
+    int totalCount = preferences.getInt("totalCount$userId") ?? 0;
 
-    int currentMealVal = widget.snapshot!.data.docs[widget.index].data()["Calories"];
-    int totalCount = preferences.getInt("totalCount$userId")??0;
-
-    preferences.setInt("totalCount$userId", currentMealVal+totalCount);
+    preferences.setInt("totalCount$userId", currentMealVal + totalCount);
   }
 
-  decrementFun()async{
+  decrementFun() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      if(countIndex > 0){
+      if (countIndex > 0) {
         countIndex--;
-        preferences.setInt("count$userId${widget.pageName}${widget.index}", countIndex);
-        int currentMealVal = widget.snapshot!.data.docs[widget.index].data()["Calories"];
-        int totalCount = preferences.getInt("totalCount$userId")??0;
-        preferences.setInt("totalCount$userId", totalCount-currentMealVal);
-      }else{
+        preferences.setInt(
+            "count$userId${widget.pageName}${widget.index}", countIndex);
+        int currentMealVal =
+            widget.snapshot!.data.docs[widget.index].data()["Calories"];
+        int totalCount = preferences.getInt("totalCount$userId") ?? 0;
+        preferences.setInt("totalCount$userId", totalCount - currentMealVal);
+      } else {
         // countIndex = countIndex;
       }
     });
   }
 
   @override
-  initState(){
+  initState() {
     getCurrentUserId();
     getCount();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -170,8 +174,7 @@ class _RowSeparatedState extends State<RowSeparated> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child:
-                    SingleChildScrollView(
+                    child: SingleChildScrollView(
                       child: Column(
                         children: [
                           Container(
@@ -181,16 +184,18 @@ class _RowSeparatedState extends State<RowSeparated> {
                               borderRadius: BorderRadius.circular(80.0),
                               color: Colors.white,
                               image: DecorationImage(
-                                onError: (ss, sd){
-                                  print("******************************$ss******************");
-                                  print("******************************$sd******************");
+                                onError: (ss, sd) {
+                                  print(
+                                      "******************************$ss******************");
+                                  print(
+                                      "******************************$sd******************");
                                 },
-                                image: NetworkImage(
-                                    widget.snapshot!.data.docs[widget.index].data()["image"]
-                                ),
+                                image: NetworkImage(widget
+                                    .snapshot!.data.docs[widget.index]
+                                    .data()["image"]),
                                 fit: BoxFit.cover,
                               ),
-                            ) ,
+                            ),
                           ),
                           Text(
                             "\"${widget.snapshot!.data.docs[widget.index].data()["name"]}\"",
@@ -218,8 +223,7 @@ class _RowSeparatedState extends State<RowSeparated> {
             child: CircleAvatar(
               child: Image.network(
                 widget.snapshot!.data.docs[widget.index].data()["image"],
-                errorBuilder:
-                    (BuildContext context, exception, stackTrace) {
+                errorBuilder: (BuildContext context, exception, stackTrace) {
                   return const Icon(
                     Icons.do_not_disturb,
                     color: Colors.grey,

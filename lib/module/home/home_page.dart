@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled6/module/helthyfood/helthy.dart';
+
 import '../restorant/itemsDetaials/item_details.dart';
 import '../restorant/restorant.dart';
 
@@ -13,6 +17,59 @@ class DailyScreen extends StatefulWidget {
 }
 
 class _DailyScreenState extends State<DailyScreen> {
+  // int? currentDate = DateTime.now().day;
+  // var day;
+
+  saveDay()async{
+    int currentDay = DateTime.now().day;
+    int? day;
+    int youssef;
+    var pre = await SharedPreferences.getInstance();
+    day = pre.getInt("currentDay") == null ? 1 : pre.getInt("currentDay")!;
+    if(day != currentDay){
+
+      youssef = pre.getInt("currentYear") == null ? 2021 : pre.getInt("currentYear")!;
+
+      pre.clear();
+
+      pre.setInt("currentYear", youssef);
+      pre.setInt("currentDay", currentDay);
+    }
+  }
+
+
+  autoUpdateAge()async{
+    int currentYear = DateTime.now().year;
+    int year;
+    int? currentAge;
+
+
+    var pre = await SharedPreferences.getInstance();
+    year = pre.getInt("currentYear") == null ? 2021 : pre.getInt("currentYear")!;
+
+
+    if(year != currentYear){
+      CollectionReference collection = FirebaseFirestore.instance.collection("UserInfo");
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+
+      pre.setInt("currentYear", currentYear);
+      await collection.doc(userId).get().then((value) => {
+        currentAge = value["age"],
+      });
+
+      await collection.doc(userId).update({
+        "age": currentAge!+1,
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    saveDay();
+    autoUpdateAge();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,8 +172,6 @@ class _DailyScreenState extends State<DailyScreen> {
 }
 
 class HomeContainer extends StatelessWidget {
-  // const HomeContainer({Key? key}) : super(key: key);
-
   HomeContainer({this.text, this.imagePath, this.onPressedFun});
 
   final String? text;
@@ -126,7 +181,7 @@ class HomeContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         onPressedFun!();
       },
       child: Padding(
@@ -136,18 +191,16 @@ class HomeContainer extends StatelessWidget {
           start: 20.0,
           end: 20.0,
         ),
-        child:
-        Container(
+        child: Container(
           height: 200,
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: Colors.brown,
-            image: DecorationImage(
-              image: AssetImage('asset/$imagePath'),
-              fit: BoxFit.cover,
-            )
-          ),
+              borderRadius: BorderRadius.circular(20.0),
+              color: Colors.brown,
+              image: DecorationImage(
+                image: AssetImage('asset/$imagePath'),
+                fit: BoxFit.cover,
+              )),
           child: Center(
             child: Text(
               text!,

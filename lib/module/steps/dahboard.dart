@@ -1,12 +1,14 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled6/module/steps/widget/DashBoardCard.dart';
 import 'package:untitled6/module/steps/widget/topTextButton.dart';
+import 'package:provider/provider.dart';
 
 class dashboard extends StatefulWidget {
   const dashboard({Key? key}) : super(key: key);
@@ -16,6 +18,8 @@ class dashboard extends StatefulWidget {
 }
 
 class _dashboardState extends State<dashboard> {
+
+  //dahboard
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -24,6 +28,7 @@ class _dashboardState extends State<dashboard> {
   double duration = 0.0;
   double calories = 0.0;
   int steps = 0;
+  int? totalSteps;
 
   double previousDistance = 0.0;
   double distance = 0.0;
@@ -32,17 +37,6 @@ class _dashboardState extends State<dashboard> {
 
   String userId = FirebaseAuth.instance.currentUser!.uid;
 
-  var platform = const MethodChannel("stepsCounter/project");
-
-  fun()async{
-    try{
-      await platform.invokeMethod("stepCountFun", steps);
-    }on PlatformException catch(e){
-      print(e.message);
-    }
-  }
-
-
   getTotalCount() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -50,15 +44,89 @@ class _dashboardState extends State<dashboard> {
     });
   }
 
+  Future<void> saveSteps() async {
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    SharedPreferences save = await SharedPreferences.getInstance();
+    save.setInt("${userId}steps", steps);
+  }
+
+  Future<void> getSteps() async {
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    SharedPreferences save = await SharedPreferences.getInstance();
+    setState(() {
+      steps = save.getInt("${userId}steps") ?? 0;
+    });
+  }
+
+
+
+  //dashBoard
+  int? age;
+  int? weight;
+  int? height;
+  double target = 0;
+
+  getUserDataFromFirebase() async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await FirebaseFirestore.instance
+          .collection("UserInfo")
+          .doc(userId)
+          .get()
+          .then((value) => {
+        age = value["age"],
+        weight = value["weight"],
+        height = value["height"],
+      });
+      setState(() {
+        getTargetFun();
+        age;
+        weight;
+        height;
+      });
+    } catch (e) {}
+  }
+
+  getTargetFun() async {
+    setState(() {});
+    // if(gender == male){
+    //  target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) + 5) * 1.2));
+    // }else{
+    //  target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) - 161) * 1.2));
+    // }
+    target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) + 5) * 1.2));
+    setState(() {
+      target;
+    });
+  }
+
+  saveDay()async{
+    int currentDay = DateTime.now().day;
+    int? day;
+    var pre = await SharedPreferences.getInstance();
+    day = pre.getInt("currentDay") == null ? 1 : pre.getInt("currentDay")!;
+    if(day != currentDay){
+      pre.clear();
+      pre.setInt("currentDay", currentDay);
+    }
+  }
+
+
   @override
   initState() {
+    //dahboard
+    getSteps();
     getTotalCount();
+
+    //dashboard
+    getUserDataFromFirebase();
+    saveDay();
     super.initState();
   }
 
   @override
   void dispose() {
-    fun();
+    saveSteps();
     super.dispose();
   }
 
@@ -88,34 +156,217 @@ class _dashboardState extends State<dashboard> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 56.0,
+                    height: 30.0,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                          decoration: BoxDecoration(
-                              color: Colors.teal,
-                              borderRadius: BorderRadius.circular(10.0)),
-                          child: topText("Calories", false, () {})),
+                        decoration: BoxDecoration(
+                          color: Colors.teal,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: topText("Calories", false, () {},),
+                      ),
                       topText("$totalCal", true, () {}),
                     ],
                   ),
-                  DashBoardCard(
-                    steps: steps,
-                    calories: calories,
-                    miles: miles,
-                    duration: duration,
-                    totalCal: totalCal,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          // color: Colors.teal,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: topText(
+                          "Target",
+                          true,
+                              () {},
+                          visi: false,
+                        ),
+                      ),
+                      topText(target.toStringAsFixed(0), true, () {}, visi: true)
+                    ],
                   ),
-                  //const dailyAverage(),
+                  Column(
+                    children: [
+                      Image.asset(
+                        "asset/steps/undraw_Random_thoughts_re_cob6 (1).png",
+                        width: 300,
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Card(
+                        elevation: 30,
+                        shape: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(60),
+                          borderSide: BorderSide.none,
+                        ),
+                        child: Container(
+                          height: 200,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            border: Border.all(
+                              color: Colors.green,
+                              width: 0,
+                            ),
+                            borderRadius: BorderRadius.circular(60.0),
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  steps.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 17),
+                                  child: (age == null || weight == null || height == null)
+                                      ? const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.teal,
+                                    ),
+                                  )
+                                      : Text(
+                                    "/${(((totalCal - target) / 0.0566) <= 0? 0: (totalCal - target) / 0.0566).toStringAsFixed(0)}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                        Container(
+                          height: 150,
+                          width: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            border: Border.all(color: Colors.green, width: 1),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Image.asset(
+                                  "asset/steps/locations.png",
+                                  width: 40,
+                                ),
+                              ),
+                              Text(miles.toStringAsFixed(2),
+                                  style: GoogleFonts.aBeeZee(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                      letterSpacing: 2)),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("KM",
+                                    style: GoogleFonts.aBeeZee(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      letterSpacing: 2,
+                                    )),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 150,
+                          width: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            border: Border.all(color: Colors.green, width: 1),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Image.asset(
+                                  "asset/steps/calories.png",
+                                  width: 50,
+                                ),
+                              ),
+                              Text(
+                                calories.toStringAsFixed(2),
+                                style: GoogleFonts.aBeeZee(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    letterSpacing: 2),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text("Calories",
+                                    style: GoogleFonts.aBeeZee(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        letterSpacing: 2)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 150,
+                          width: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            border: Border.all(color: Colors.green, width: 1),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Image.asset(
+                                  "asset/steps/stopwatch.png",
+                                  width: 50,
+                                ),
+                              ),
+                              Text(duration.toStringAsFixed(2),
+                                  style: GoogleFonts.aBeeZee(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                      letterSpacing: 2)),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text("Duration",
+                                    style: GoogleFonts.aBeeZee(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        letterSpacing: 2)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                    ],
+                  ),
                 ],
               ),
             ),
           );
         },
       ),
-      //bottomNavigationBar: const buttonNav(),
     );
   }
 
@@ -141,7 +392,8 @@ class _dashboardState extends State<dashboard> {
 
   // void calculate data
   double calculateMiles(int steps) {
-    double milesValue = (2.2 * steps) / 5280;
+    // double milesValue = (2.2 * steps) / 5280;
+    double milesValue = steps * 0.00071022727;
     return milesValue;
   }
 
@@ -154,4 +406,5 @@ class _dashboardState extends State<dashboard> {
     double caloriesValue = (steps * 0.0566);
     return caloriesValue;
   }
+
 }
