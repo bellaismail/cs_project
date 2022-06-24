@@ -10,11 +10,17 @@ class FourScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            leading: Icon(Icons.arrow_back),
-            //title: Text("Today's Training"),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             backgroundColor: Colors.green,
             expandedHeight: 150,
-
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 color: Colors.green,

@@ -40,7 +40,7 @@ class _dashboardState extends State<dashboard> {
   getTotalCount() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      totalCal = preferences.getInt("totalCount$userId")!;
+      totalCal = preferences.getInt("totalCount$userId")??0;
     });
   }
 
@@ -64,6 +64,8 @@ class _dashboardState extends State<dashboard> {
   int? age;
   int? weight;
   int? height;
+
+  String? gender;
   double target = 0;
 
   getUserDataFromFirebase() async {
@@ -77,6 +79,7 @@ class _dashboardState extends State<dashboard> {
         age = value["age"],
         weight = value["weight"],
         height = value["height"],
+        gender = value["gender"],
       });
       setState(() {
         getTargetFun();
@@ -89,12 +92,29 @@ class _dashboardState extends State<dashboard> {
 
   getTargetFun() async {
     setState(() {});
-    // if(gender == male){
-    //  target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) + 5) * 1.2));
-    // }else{
-    //  target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) - 161) * 1.2));
-    // }
-    target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) + 5) * 1.2));
+
+    double bmi;
+    bmi = weight! / ((height! / 100) * (height! / 100));
+    double completeTarget = 0;
+
+    if (bmi < 18.5) {
+      completeTarget = 500;
+    } else if (bmi >= 18.5 && bmi <= 25) {
+      completeTarget = completeTarget;
+    } else if (bmi > 25 && bmi < 30) {
+      completeTarget = 400 * -1;
+    } else if(bmi >= 30){
+      completeTarget = 700 * -1;
+    }
+
+
+    if(gender == "male"){
+     target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) + 5) * 1.2)) + completeTarget;
+    }else if(gender == "female"){
+     target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) - 161) * 1.2)) + completeTarget;
+    }else{
+      target = await ((((weight! * 9.99) + (height! * 6.25) + (age! * 4.92) + 5) * 1.2)) + completeTarget;
+    }
     setState(() {
       target;
     });
@@ -236,7 +256,7 @@ class _dashboardState extends State<dashboard> {
                                     ),
                                   )
                                       : Text(
-                                    "/${(((totalCal - target) / 0.0566) <= 0? 0: (totalCal - target) / 0.0566).toStringAsFixed(0)}",
+                                    "/${(((totalCal - target) / 0.0566) <= 0? 1000: (totalCal - target) / 0.0566).toStringAsFixed(0)}",
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 17,

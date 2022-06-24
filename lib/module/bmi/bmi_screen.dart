@@ -162,28 +162,27 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   child: FlatButton.icon(
                     onPressed: () {
                       setState(() {
-                        _bmi = _weightOfUser /
-                            ((_heightOfUser / 100) * (_heightOfUser / 100));
+                        _bmi = _weightOfUser / ((_heightOfUser / 100) * (_heightOfUser / 100));
 
-                        if (_bmi >= 18.5 && _bmi <= 25) {
+                        if (_bmi < 18.5) {
+                          _bmiModel = BMIModel(
+                            bmi: _bmi,
+                            isNormal: false,
+                            comments: "You are UnderWeighted",
+                          );
+                        } else if (_bmi >= 18.5 && _bmi <= 25) {
                           _bmiModel = BMIModel(
                             bmi: _bmi,
                             isNormal: true,
-                            comments: "You are Totaly Fit",
+                            comments: "You are Totally Fit",
                           );
-                        } else if (_bmi < 18.5) {
+                        } else if (_bmi > 25 && _bmi < 30) {
                           _bmiModel = BMIModel(
                             bmi: _bmi,
                             isNormal: false,
-                            comments: "You are Underweighted",
+                            comments: "You are OverWeighted",
                           );
-                        } else if (_bmi > 25 && _bmi <= 30) {
-                          _bmiModel = BMIModel(
-                            bmi: _bmi,
-                            isNormal: false,
-                            comments: "You are Overweighted",
-                          );
-                        } else {
+                        } else if(_bmi >= 30){
                           _bmiModel = BMIModel(
                             bmi: _bmi,
                             isNormal: false,

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../login/login_screen.dart';
 import '../about/about.dart';
 import '../personal/personal.dart';
@@ -14,10 +15,6 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<Setting> {
-
-  bool showTimer = false;
-  int time = 10;
-  bool stop = false;
   bool spinner = false;
 
   @override
@@ -106,74 +103,95 @@ class _SettingsPageState extends State<Setting> {
                   height: 60.0,
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: () async {
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text(
+                            'Remove Account',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          content: const Text(
+                              'Do you really want to remove your account?'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('No'),
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  textStyle: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                var userId =
+                                    FirebaseAuth.instance.currentUser!.uid;
+                                try {
+                                  setState(() {
+                                    spinner = true;
+                                  });
 
-                      var userId = FirebaseAuth.instance.currentUser!.uid;
+                                  //to delete account from auth
+                                  await FirebaseAuth.instance.currentUser!
+                                      .delete();
 
-                      setState(() {
-                        showTimer = true;
-                      });
+                                  //to delete fields
+                                  FirebaseFirestore.instance
+                                      .collection("UserInfo")
+                                      .doc(userId)
+                                      .delete();
 
-                      mainLoop:
-                        for(int i = time; time > 0; i++){
-                          await Future.delayed(const Duration(seconds: 1)).then((value) {
-                            setState(() {
-                              time--;
-                            });
-                          });
-                            if(time == 0){
-                              try{
-                                setState(() {
-                                  spinner = true;
-                                });
-                                await FirebaseAuth.instance.currentUser!
-                                    .delete();
-
-                                await FirebaseFirestore.instance
-                                    .collection("UserInfo")
-                                    .doc(userId)
-                                    .delete();
-
-                                setState(() {
-                                  spinner = false;
-                                });
-
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginScreen(),
-                                  ),
-                                );
-                              }on FirebaseAuthException catch(e){
-                                setState(() {
-                                  spinner = false;
-                                });
-                                print("**********************/$e/***********************");
-                              }
-                            }
-                            else if(time != 0 && stop == true){
-                              setState(() {
-                                spinner = false;
-
-                                showTimer = false;
-                                time = 10;
-                                stop = false;
-                              });
-                              break mainLoop;
-                            }
-
-                        }
+                                  setState(() {
+                                    spinner = false;
+                                  });
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LoginScreen(),
+                                    ),
+                                  );
+                                } on FirebaseAuthException catch (e) {
+                                  setState(() {
+                                    spinner = false;
+                                  });
+                                  print(
+                                      "**********************/${e.code}/***********************");
+                                }
+                              },
+                              child: const Text('Yes'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                textStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     child: const Text(
                       "Remove Account",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         color: Colors.white,
                         fontFamily: "Cairo",
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.redAccent,
+                      primary: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
@@ -297,19 +315,70 @@ class _SettingsPageState extends State<Setting> {
                   height: 60.0,
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: () async {
-                      try {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginScreen()));
-                        await FirebaseAuth.instance.signOut();
-                      } catch (e) {
-                        print("********** wrong in signout *************");
-                      }
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text(
+                            'Logout',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Colors.green),
+                          ),
+                          content: const Text('Do you really want to Logout?'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Back'),
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  textStyle: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                setState(() {
+                                  spinner = true;
+                                });
+                                FirebaseAuth.instance
+                                    .signOut()
+                                    .then((value) => {
+                                          print("*************** logout ************"),
+                                        });
+                                setState(() {
+                                  spinner = false;
+                                });
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text('confirm'),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                textStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     child: const Text(
-                      "log Out",
+                      "Logout",
                       style: TextStyle(
                         fontSize: 22,
                         color: Colors.white,
@@ -328,86 +397,6 @@ class _SettingsPageState extends State<Setting> {
               const SizedBox(
                 height: 30,
               ),
-              (showTimer)
-                  ? Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
-                              border: Border.all(
-                                color: Colors.grey,
-                              ),
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "back",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontFamily: "Cairo",
-                                ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  showTimer = false;
-                                  stop = true;
-                                });
-                              },
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 5.0,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(5.0),
-                                border: Border.all(
-                                  color: Colors.red,
-                                )),
-                            child: TextButton(
-                              child: const Text(
-                                "confirm",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Cairo",
-                                ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  showTimer = false;
-                                  time = 1;
-                                });
-                              },
-                            ),
-                          ),
-                          const Expanded(child: SizedBox()),
-                          Container(
-                            height: 60,
-                            width: 50,
-                            padding: const EdgeInsets.all(1.0),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.grey,
-                                )),
-                            child: Center(
-                              child: Text(
-                                "$time",
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 25,
-                                  fontFamily: "Cairo",
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : const SizedBox(),
             ],
           ),
         ),

@@ -8,6 +8,15 @@ class GymScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.green,
+          ),
+        ),
         title: const Text(
           "Training Fitness",
           style: TextStyle(

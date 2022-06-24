@@ -13,7 +13,15 @@ class SecoundScreen extends StatelessWidget{
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            leading: const Icon(Icons.arrow_back),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             backgroundColor: Colors.green,
             expandedHeight: 150,
             flexibleSpace: FlexibleSpaceBar(

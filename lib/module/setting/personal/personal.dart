@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class PersonalInfo extends StatefulWidget {
@@ -14,7 +15,7 @@ class PersonalInfo extends StatefulWidget {
 class _PersonalInfoState extends State<PersonalInfo> {
   bool passObscure = true;
   IconData iconData = Icons.visibility_off_rounded;
-  bool inAcyncCall = false;
+  bool spinner = false;
 
   String userId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -49,19 +50,18 @@ class _PersonalInfoState extends State<PersonalInfo> {
           .collection("UserInfo")
           .doc(userId)
           .get()
-          .then((val) =>
-      {
-        if (val.exists)
-          {
-            hintName = val["name"],
-            hintEmail = val["email"],
-          }
-        else
-          {
-            print(
-                "********************** something error from getUserInfo ***************")
-          }
-      });
+          .then((val) => {
+                if (val.exists)
+                  {
+                    hintName = val["name"],
+                    hintEmail = val["email"],
+                  }
+                else
+                  {
+                    print(
+                        "********************** something error from getUserInfo ***************")
+                  }
+              });
       setState(() {
         hintName;
         hintEmail;
@@ -69,63 +69,94 @@ class _PersonalInfoState extends State<PersonalInfo> {
     }
   }
 
-  updateUserName() async {
+  updateUserInfo() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
+    var userId = FirebaseAuth.instance.currentUser!.uid;
+    String? currentEmail = FirebaseAuth.instance.currentUser!.email;
+
     if (connectivityResult == ConnectivityResult.mobile ||
         connectivityResult == ConnectivityResult.wifi) {
+      if (_key.currentState!.validate()) {
         try {
           setState(() {
-            inAcyncCall = true;
+            spinner = true;
           });
-          await FirebaseFirestore.instance
-              .collection("UserInfo")
-              .doc(userId)
-              .update({
-            "name": textEditingControllerName.text != ""
-                ? textEditingControllerName.text
-                : hintName,
-            "email": textEditingControllerEmail.text != ""
-                ? textEditingControllerEmail.text
-                : hintEmail,
-          }).then((value) =>
-          {
-            textEditingControllerName.clear(),
-            textEditingControllerEmail.clear(),
-          });
+
+          await FirebaseAuth.instance
+              .signInWithEmailAndPassword(
+                  email: currentEmail!,
+                  password: textEditingControllerPass.text)
+              .then(
+                (value) => {
+                  print("*****////****** Enter ****/////*******"),
+                  FirebaseFirestore.instance
+                      .collection("UserInfo")
+                      .doc(userId)
+                      .update(
+                    {
+                      "name": textEditingControllerName.text != ""
+                          ? textEditingControllerName.text
+                          : hintName,
+                      "email": textEditingControllerEmail.text != ""
+                          ? textEditingControllerEmail.text
+                          : hintEmail,
+                    },
+                  ).then(
+                    (value) => {
+                      Fluttertoast.showToast(
+                        msg: "Update Successfully",
+                        toastLength: Toast.LENGTH_SHORT,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                        backgroundColor: Colors.green,
+                        gravity: ToastGravity.TOP,
+                      ),
+                      updateUserEmailOnAuth(),
+                      textEditingControllerName.clear(),
+                      textEditingControllerEmail.clear(),
+                    },
+                  ),
+                },
+              );
+
           setState(() {
-            inAcyncCall = false;
+            spinner = false;
           });
         } on FirebaseAuthException catch (e) {
           setState(() {
-            inAcyncCall = false;
+            spinner = false;
           });
-          if (e.code == 'email-already-in-use') {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(snackBar("This Email Already Exist"));
+          if (e.code == "wrong-password") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              snackBar("password Not correct"),
+            );
           }
         } catch (e) {
           setState(() {
-            inAcyncCall = false;
+            spinner = false;
           });
-          print(
-              "//**************************ERROR:$e on update name fun**************************");
         }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        snackBar("Check Your Internet"),
+      );
     }
   }
 
-  updateUserEmail() async {
+  updateUserEmailOnAuth() async {
     try {
       setState(() {
-        inAcyncCall = true;
+        spinner = true;
       });
       await FirebaseAuth.instance.currentUser!
           .updateEmail(textEditingControllerEmail.text);
       setState(() {
-        inAcyncCall = false;
+        spinner = false;
       });
     } catch (e) {
       setState(() {
-        inAcyncCall = false;
+        spinner = false;
       });
       print(
           "//**************************ERROR:$e on update name fun**************************");
@@ -143,9 +174,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Theme
-            .of(context)
-            .scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0.0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.green),
@@ -163,7 +192,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
         ),
       ),
       body: ModalProgressHUD(
-        inAsyncCall: inAcyncCall,
+        inAsyncCall: spinner,
         child: Form(
           key: _key,
           child: Padding(
@@ -178,16 +207,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   onChangeText: nameOnChange,
                   textEditingController: textEditingControllerName,
                   textInputType: TextInputType.name,
-                  textFormValidtor: (val) {
-                    if (val!.length < 8) {
-                      return "name can't be less than 8 letters";
-                    }
-                    if (val.contains("*") ||
-                        val.contains("#") ||
-                        val.contains("-")) {
-                      return 'name not valid';
-                    }
-                  },
                 ),
                 BuildTextField(
                   hint: hintEmail,
@@ -197,22 +216,20 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   onChangeText: emailOnChange,
                   textEditingController: textEditingControllerEmail,
                   textInputType: TextInputType.emailAddress,
-                  textFormValidtor: (val) {
-                    if (val == null) {
-                      return "email can't be empty";
-                    } else if (val != null && val.length < 8) {
-                      return "email can't be less than 8 letter";
-                    }
-                  },
                 ),
                 BuildTextField(
-                  hint: hintPass,
+                  hint: "set password",
                   label: "password",
                   iconData: iconData,
                   obscure: passObscure,
                   onChangeText: passOnChange,
                   textEditingController: textEditingControllerPass,
                   textInputType: TextInputType.visiblePassword,
+                  textFormValidtor: (val) {
+                    if (val!.isEmpty) {
+                      return "you must set password";
+                    }
+                  },
                 ),
                 Center(
                   child: Container(
@@ -222,8 +239,8 @@ class _PersonalInfoState extends State<PersonalInfo> {
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () async {
-                        await updateUserEmail();
-                        await updateUserName();
+                        // await updateUserEmail();
+                        await updateUserInfo();
                         await getUserinfo();
                       },
                       child: const Text(
@@ -282,10 +299,8 @@ class _BuildTextFieldState extends State<BuildTextField> {
         controller: widget.textEditingController,
         onChanged: (val) {
           widget.onChangeText = val;
-          print(
-              "/////////////////////${widget
-                  .onChangeText}***************************");
         },
+        obscuringCharacter: "*",
         onTap: () {},
         style: const TextStyle(
           fontFamily: "Cairo",
@@ -302,46 +317,46 @@ class _BuildTextFieldState extends State<BuildTextField> {
           ),
           suffixIcon: widget.label != "Full Name"
               ? Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: IconButton(
-              onPressed: () {
-                if (widget.label == "password") {
-                  if (widget.obscure == true) {
-                    setState(() {
-                      widget.obscure = false;
-                      widget.iconData = Icons.visibility;
-                    });
-                  } else {
-                    setState(() {
-                      widget.obscure = true;
-                      widget.iconData = Icons.visibility_off_rounded;
-                    });
-                  }
-                }
-              },
-              icon: Icon(
-                widget.iconData,
-                color: Colors.grey,
-              ),
-            ),
-          )
+                  padding: const EdgeInsets.all(0.0),
+                  child: IconButton(
+                    onPressed: () {
+                      if (widget.label == "password") {
+                        if (widget.obscure == true) {
+                          setState(() {
+                            widget.obscure = false;
+                            widget.iconData = Icons.visibility;
+                          });
+                        } else {
+                          setState(() {
+                            widget.obscure = true;
+                            widget.iconData = Icons.visibility_off_rounded;
+                          });
+                        }
+                      }
+                    },
+                    icon: Icon(
+                      widget.iconData,
+                      color: Colors.grey,
+                    ),
+                  ),
+                )
               : Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.grey.shade100,
-              child: IconButton(
-                onPressed: () {
-                  if (widget.textEditingController != null) {
-                    widget.textEditingController!.clear();
-                  }
-                },
-                icon: Icon(
-                  widget.iconData,
-                  color: Colors.grey,
+                  padding: const EdgeInsets.all(5.0),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.grey.shade100,
+                    child: IconButton(
+                      onPressed: () {
+                        if (widget.textEditingController != null) {
+                          widget.textEditingController!.clear();
+                        }
+                      },
+                      icon: Icon(
+                        widget.iconData,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
           contentPadding: const EdgeInsets.only(bottom: 3),
           labelText: widget.label,
           floatingLabelBehavior: FloatingLabelBehavior.always,

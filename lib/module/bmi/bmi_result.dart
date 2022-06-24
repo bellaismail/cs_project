@@ -21,7 +21,7 @@ class ResultScreen extends StatelessWidget {
               Container(
                 child:Column(
                   children: [
-                    if (bmiModel.comments == "You are Totaly Fit") ...[
+                    if (bmiModel.comments == "You are Totally Fit") ...[
                       Container(
                         height: 200,
                         width: 180,
@@ -36,7 +36,7 @@ class ResultScreen extends StatelessWidget {
 
                         ),
                       ),
-                    ] else if(bmiModel.comments==  "You are Underweighted")...[
+                    ] else if(bmiModel.comments==  "You are UnderWeighted")...[
                       Container(
                         height: 200,
                         width: 130,
@@ -51,14 +51,14 @@ class ResultScreen extends StatelessWidget {
 
                         ),
                       ),
-                    ]else if(bmiModel.comments==  "You are Overweighted")...[
+                    ]else if(bmiModel.comments==  "You are OverWeighted")...[
                       Container(
                         height: 200,
                         width: 130,
                         decoration: const BoxDecoration(
                           color: Colors.white24,
                           image: DecorationImage(
-                            image: AssetImage("asset/bmi/obeas.jpeg"),
+                            image: AssetImage("asset/bmi/fat.jpeg"),
                             fit: BoxFit.fill,
                           ),
                           borderRadius:BorderRadius.all(Radius.circular(5.0)),

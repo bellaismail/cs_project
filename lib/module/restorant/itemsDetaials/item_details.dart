@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -15,7 +16,12 @@ class ItemDetails extends StatefulWidget {
   State<ItemDetails> createState() => _ItemDetailsState();
 }
 
+
 class _ItemDetailsState extends State<ItemDetails> {
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,10 +111,12 @@ class _RowSeparatedState extends State<RowSeparated> {
   getCount() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      countIndex = preferences.getInt("count$userId${widget.pageName}${widget.index}") ==
-              null
-          ? countIndex
-          : preferences.getInt("count$userId${widget.pageName}${widget.index}")!;
+      countIndex =
+          preferences.getInt("count$userId${widget.pageName}${widget.index}") ==
+                  null
+              ? countIndex
+              : preferences
+                  .getInt("count$userId${widget.pageName}${widget.index}")!;
     });
   }
 
@@ -143,6 +151,7 @@ class _RowSeparatedState extends State<RowSeparated> {
       }
     });
   }
+
 
   @override
   initState() {
