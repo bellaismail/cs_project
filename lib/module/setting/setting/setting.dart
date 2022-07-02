@@ -133,6 +133,7 @@ class _SettingsPageState extends State<Setting> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
+                                Navigator.pop(context);
                                 var userId =
                                     FirebaseAuth.instance.currentUser!.uid;
                                 try {
@@ -141,7 +142,7 @@ class _SettingsPageState extends State<Setting> {
                                   });
 
                                   //to delete account from auth
-                                  await FirebaseAuth.instance.currentUser!
+                                  FirebaseAuth.instance.currentUser!
                                       .delete();
 
                                   //to delete fields
@@ -153,12 +154,14 @@ class _SettingsPageState extends State<Setting> {
                                   setState(() {
                                     spinner = false;
                                   });
+
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => LoginScreen(),
                                     ),
                                   );
+
                                 } on FirebaseAuthException catch (e) {
                                   setState(() {
                                     spinner = false;
@@ -342,12 +345,12 @@ class _SettingsPageState extends State<Setting> {
                                       fontWeight: FontWeight.bold)),
                             ),
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async{
                                 Navigator.pop(context);
                                 setState(() {
                                   spinner = true;
                                 });
-                                FirebaseAuth.instance
+                                await FirebaseAuth.instance
                                     .signOut()
                                     .then((value) => {
                                           print("*************** logout ************"),

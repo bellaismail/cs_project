@@ -114,6 +114,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
                       updateUserEmailOnAuth(),
                       textEditingControllerName.clear(),
                       textEditingControllerEmail.clear(),
+                      textEditingControllerPass.clear(),
                     },
                   ),
                 },
