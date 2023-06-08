@@ -11,7 +11,8 @@ class GetDeviceInfo{
     try{
       if(Platform.isAndroid){
         var build = await deviceInfo.androidInfo;
-        deviceId = build.androidId;
+        deviceId = build.id;
+        // deviceId = build.androidId;
         print("///***///*** $deviceId ***///***///");
       }
     }catch(e){

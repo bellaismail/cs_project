@@ -22,7 +22,7 @@ class ModalBottomSheetDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: RaisedButton(
+      child: MaterialButton(
         child: const Text('showModalBottomSheet'),
         onPressed: () {
 
@@ -37,13 +37,13 @@ class ModalBottomSheetDemo extends StatelessWidget {
 
               // we set up a container inside which
               // we create center column and display text
-              return Container(
+              return const SizedBox(
                 height: 200,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Text('GeeksforGeeks'),
+                       Text('GeeksforGeeks'),
                     ],
                   ),
                 ),

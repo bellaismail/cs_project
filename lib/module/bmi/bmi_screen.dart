@@ -159,7 +159,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   margin: const EdgeInsets.all(6.0),
                   width: double.infinity,
                   height: 60.0,
-                  child: FlatButton.icon(
+                  child: TextButton.icon(
                     onPressed: () {
                       setState(() {
                         _bmi = _weightOfUser / ((_heightOfUser / 100) * (_heightOfUser / 100));
@@ -209,21 +209,24 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontFamily: "Cairo",
+                        color: Colors.white,
                       ),
                     ),
-                    textColor: Colors.white,
-                    color: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.green),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),),
                     ),
                   ),
-                ),
                 Container(
                   padding: const EdgeInsets.all(8.0),
                   margin: const EdgeInsets.all(6.0),
                   width: double.infinity,
                   height: 60.0,
-                  child: FlatButton.icon(
+                  child: TextButton.icon(
                     onPressed: () async {
                       String userId = FirebaseAuth.instance.currentUser!.uid;
                       try {
@@ -265,15 +268,18 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontFamily: "Cairo",
+                        color: Colors.white,
                       ),
                     ),
-                    textColor: Colors.white,
-                    color: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.green),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),),
                     ),
                   ),
-                ),
               ],
             ),
           ),

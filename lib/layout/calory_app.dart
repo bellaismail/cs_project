@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:untitled6/shared/cubit/cubit.dart';
 import 'package:untitled6/shared/cubit/states.dart';
 
